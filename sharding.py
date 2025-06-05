@@ -99,8 +99,30 @@ class ShardedDatabase:
 
     # TODO 3: implement this method as stated in the exercise description
     def empty_nodes_check_remaining(self,nodes_to_empty=None):
-        return
-    
+        if nodes_to_empty is None:
+            nodes_to_empty = []
+
+        deleted = []
+        still_available = []
+
+        for i in range(10):
+            keys = list(self.nodes[i].getall())
+            if i in nodes_to_empty:
+                deleted.extend(keys)
+            else:
+                still_available.extend(keys)
+
+            self.empty_nodes(nodes_to_empty)
+
+        if self.doesDBContainKeys(deleted):
+            raise Exception("Exception raised")  
+        
+        if not self.doesDBContainKeys(still_available):
+            raise Exception("Exception raised")  
+
+        
+        return deleted,still_available
+            
     # TODO 4: implement this method as stated in the exercise description
     def create_replicates(self):
         return 
