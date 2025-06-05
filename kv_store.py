@@ -173,6 +173,7 @@ def main(initial_kv_store, operation_list_list, undo_operation_list_list, redo_l
         for operation in reversed(operation_list):
             action = operation["action"]
             key = operation["key"]
+            initial_snapshot = initial_kv_store.copy()
             # TODO Undo the action of the operation
             # ["set", "delete", "add", "subtract", "multiply", "divide"]
             # Hint: Consider if the key existed in the initial store or not
