@@ -115,13 +115,13 @@ class ShardedDatabase:
             self.empty_nodes(nodes_to_empty)
 
         if self.doesDBContainKeys(deleted):
-            raise Exception("Exception raised")  
-        
-        if not self.doesDBContainKeys(still_available):
-            raise Exception("Exception raised")  
+            raise Exception(self.ERROR_MESSAGE_INVALID_DELTA)
 
-        
-        return deleted,still_available
+        if not self.doesDBContainKeys(still_available):
+            raise Exception(self.ERROR_MESSAGE_INVALID_DELTA)
+
+        # Step 4: Rückgabe
+        return still_available, deleted
             
     # TODO 4: implement this method as stated in the exercise description
     def create_replicates(self):
