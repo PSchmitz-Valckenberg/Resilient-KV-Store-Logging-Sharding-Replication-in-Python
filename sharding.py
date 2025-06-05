@@ -89,10 +89,8 @@ class ShardedDatabase:
     
     # TODO 2: implement this method as stated in the exercise description
     def doesDBContainKeys(self, keys: list):
-        for key in keys:
-            if not self.doesDBContainKey(key):
-                return False
-        return True
+        return all(self.doesDBContainKey(key) for key in keys)
+
 
     ERROR_MESSAGE_INVALID_DELTA = "The values still in the database are not what they should be"
     replicate_nodes = None
@@ -118,7 +116,6 @@ class ShardedDatabase:
         if not self.doesDBContainKeys(still_available):
             raise Exception(self.ERROR_MESSAGE_INVALID_DELTA)
 
-        # Step 4: Rückgabe
         return still_available, deleted
             
     # TODO 4: implement this method as stated in the exercise description
