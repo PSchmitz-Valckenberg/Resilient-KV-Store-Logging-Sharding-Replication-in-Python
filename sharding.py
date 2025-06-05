@@ -38,6 +38,7 @@ class ShardedDatabase:
         else:
             return 0
 
+
     def store_books(self):
         for book in books:
             # Map study courses to hash-modulo keys
