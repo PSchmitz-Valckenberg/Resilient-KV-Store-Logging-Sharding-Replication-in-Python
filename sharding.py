@@ -112,7 +112,7 @@ class ShardedDatabase:
             else:
                 still_available.extend(keys)
 
-            self.empty_nodes(nodes_to_empty)
+        self.empty_nodes(nodes_to_empty)
 
         if self.doesDBContainKeys(deleted):
             raise Exception(self.ERROR_MESSAGE_INVALID_DELTA)
