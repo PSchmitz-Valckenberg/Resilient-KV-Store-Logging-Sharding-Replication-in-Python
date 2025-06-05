@@ -131,13 +131,31 @@ class ShardedDatabase:
         return self.replicate_nodes
  
     
-    # TODO 5: implement this method as stated in the exercise description
     def recover_node(self, node_index):
-        return 
+        if self.replicate_nodes is None or node_index not in self.replicate_nodes:
+            raise Exception("Replica not found for this node.")
+
+        original_node = self.nodes[node_index]
+        replica_node = self.replicate_nodes[node_index]
+
+        for key in original_node.getall():
+            original_node.rem(key)
+
+        for key in replica_node.getall():
+            value = replica_node.get(key)
+            original_node.set(key, value)
+
+        original_node.dump()
+
+        return original_node
+
     
     # TODO 6: implement this method as stated in the exercise description
     def recover_nodes(self,nodes_to_recover):
-        return 
+        res=[]
+        for node_to in nodes_to_recover:
+            res.append(self.recover_node(node_to))
+        return res
 
 
 
