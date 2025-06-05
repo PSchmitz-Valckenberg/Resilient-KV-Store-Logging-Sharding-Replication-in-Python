@@ -82,7 +82,10 @@ class ShardedDatabase:
 
     # TODO 1: implement this method as stated in the exercise description
     def doesDBContainKey(self, key: str):
-        return
+        for i in range(10):
+            if sharded_db.nodes[i].exists(key):
+                return True            
+        return False
     
     # TODO 2: implement this method as stated in the exercise description
     def doesDBContainKeys(self, keys: list):
