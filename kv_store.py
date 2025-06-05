@@ -109,17 +109,39 @@ def apply_operation(operation, store):
     # Hint: After calculation with numerical type, convert into str
     # ["set", "delete", "add", "subtract", "multiply", "divide"]
     # When applying mathematical operations on a non-existent key, initialize it with value 0
-    
-    # non-existent key handling here
-    # TODO
-
-    # operation handling here
     if action == "set":
         store[key] = str(convert_string_to_number(operation["value"]))
     elif action == "delete":
-        store.pop(key)
-    # other actions here
-    # TODO
+        if key in store:
+            store.pop(key)
+    elif action == "add":
+        if key not in store:
+            store[key] = "0"
+        old = convert_string_to_number(store[key])
+        val = convert_string_to_number(operation["value"])
+        store[key] = str(old + val)
+    elif action == "subtract":
+        if key not in store:
+            store[key] = "0"
+        old = convert_string_to_number(store[key])
+        val = convert_string_to_number(operation["value"])
+        store[key] = str(old - val)
+    elif action == "multiply":
+        if key not in store:
+            store[key] = "0"
+        old = convert_string_to_number(store[key])
+        val = convert_string_to_number(operation["value"])
+        store[key] = str(old * val)
+    elif action == "divide":
+        if key not in store:
+            store[key] = "0"
+        old = convert_string_to_number(store[key])
+        val = convert_string_to_number(operation["value"])
+        if val != 0:
+            store[key] = str(old / val)
+        else:
+            store[key] = "0"  # oder Fehlerbehandlung je nach Vorgabe
+
 
 def main(initial_kv_store, operation_list_list, undo_operation_list_list, redo_log_file, undo_log_file):
     """
@@ -141,7 +163,7 @@ def main(initial_kv_store, operation_list_list, undo_operation_list_list, redo_l
     for operation_list in operation_list_list:
         # TODO Step 1: Log and apply operations
         # Hint: you should consider using redo_log_file with logging function.
-
+        log_and_apply_operations(operation_list,kv_store,redo_log_file)
 
     comparison_kv_store = kv_store.copy()
 
@@ -155,6 +177,30 @@ def main(initial_kv_store, operation_list_list, undo_operation_list_list, redo_l
             # ["set", "delete", "add", "subtract", "multiply", "divide"]
             # Hint: Consider if the key existed in the initial store or not
             # Hint: Consider machine precision for division
+            value = operation.get("value", "0")  # Falls keine vorhanden (z.B. bei delete)
+            if action == "set":
+                # Undo = lösche Key, falls er vorher nicht existierte, sonst setze alten Wert zurück
+                if key in initial_snapshot:
+                    undo_op = {"action": "set", "key": key, "value": initial_snapshot[key]}
+                else:
+                    undo_op = {"action": "delete", "key": key}
+            elif action == "delete":
+                # Undo = setze alten Wert zurück (aus initial snapshot)
+                if key in initial_snapshot:
+                    undo_op = {"action": "set", "key": key, "value": initial_snapshot[key]}
+                else:
+                    continue  # nichts tun
+            elif action == "add":
+                undo_op = {"action": "subtract", "key": key, "value": value}
+            elif action == "subtract":
+                undo_op = {"action": "add", "key": key, "value": value}
+            elif action == "multiply":
+                undo_op = {"action": "divide", "key": key, "value": value}
+            elif action == "divide":
+                undo_op = {"action": "multiply", "key": key, "value": value}
+            else:
+                continue
+            undo_operations_list.append(undo_op)
             
         undo_operation_list_list.append(undo_operations_list)
             
@@ -163,13 +209,17 @@ def main(initial_kv_store, operation_list_list, undo_operation_list_list, redo_l
     with open(undo_log_file, "w") as file:
         for operation_list in undo_operation_list_list:
             # TODO Step 3: Write undo log to corresponding log file.
+            file.write(json.dumps(operation_list) + "\n")
+
             
 
     # TODO Step 4: Apply Undo Log
     # apply_log here
+    apply_log(undo_log_file, kv_store)
 
     # TODO Step 5: Apply Redo Log
     # apply_log here
+    apply_log(redo_log_file, kv_store)
 
     # Step 6: Comparison of initial state and the state after the log files
     return kv_store, comparison_kv_store
