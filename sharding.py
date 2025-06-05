@@ -106,7 +106,7 @@ class ShardedDatabase:
         still_available = []
 
         for i in range(10):
-            keys = list(self.nodes[i].getall())
+            keys = [str(k) for k in self.nodes[i].getall()]
             if i in nodes_to_empty:
                 deleted.extend(keys)
             else:
