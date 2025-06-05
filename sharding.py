@@ -109,7 +109,7 @@ class ShardedDatabase:
             else:
                 still_available.extend(keys)
 
-        self.empty_nodes(deleted)
+        self.empty_nodes(nodes_to_empty)
 
         if self.doesDBContainKeys(deleted):
             raise Exception(self.ERROR_MESSAGE_INVALID_DELTA)
@@ -139,7 +139,7 @@ class ShardedDatabase:
         original_node = self.nodes[node_index]
         replica_node = self.replicate_nodes[node_index]
 
-        for key in original_node.getall():
+        for key in list(original_node.getall()):
             original_node.rem(key)
 
         for key in replica_node.getall():
@@ -147,8 +147,8 @@ class ShardedDatabase:
             original_node.set(key, value)
 
         original_node.dump()
-
         return original_node
+
 
     
     # TODO 6: implement this method as stated in the exercise description
