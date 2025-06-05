@@ -118,9 +118,18 @@ class ShardedDatabase:
 
         return still_available, deleted
             
-    # TODO 4: implement this method as stated in the exercise description
     def create_replicates(self):
-        return 
+        self.replicate_nodes = {}
+
+        for i in range(10):
+            replica = pickledb.load(f"replica_node_{i}.db", False)
+            for key in self.nodes[i].getall():
+                replica.set(key, self.nodes[i].get(key))
+            replica.dump()
+            self.replicate_nodes[i] = replica
+
+        return self.replicate_nodes
+ 
     
     # TODO 5: implement this method as stated in the exercise description
     def recover_node(self, node_index):
