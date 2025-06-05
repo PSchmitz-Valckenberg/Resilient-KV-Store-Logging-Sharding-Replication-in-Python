@@ -99,8 +99,6 @@ class ShardedDatabase:
 
     # TODO 3: implement this method as stated in the exercise description
     def empty_nodes_check_remaining(self,nodes_to_empty=None):
-        if nodes_to_empty is None:
-            nodes_to_empty = []
 
         deleted = []
         still_available = []
@@ -112,7 +110,7 @@ class ShardedDatabase:
             else:
                 still_available.extend(keys)
 
-        self.empty_nodes(nodes_to_empty)
+        self.empty_nodes(deleted)
 
         if self.doesDBContainKeys(deleted):
             raise Exception(self.ERROR_MESSAGE_INVALID_DELTA)
